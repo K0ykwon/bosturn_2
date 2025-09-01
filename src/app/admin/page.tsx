@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import type { Executive, Post, Resource, FAQ } from '@/lib/redis'
 
 export default function Admin() {
   const [password, setPassword] = useState('')
@@ -9,19 +10,19 @@ export default function Admin() {
   const [adminPassword, setAdminPassword] = useState('')
   const [activeSection, setActiveSection] = useState('')
   const [showAddExecutiveForm, setShowAddExecutiveForm] = useState(false)
-  const [editingExecutive, setEditingExecutive] = useState<any>(null)
+  const [editingExecutive, setEditingExecutive] = useState<Executive | null>(null)
   const [showAddFaqForm, setShowAddFaqForm] = useState(false)
-  const [editingFaq, setEditingFaq] = useState<any>(null)
+  const [editingFaq, setEditingFaq] = useState<FAQ | null>(null)
   const [showAddPostForm, setShowAddPostForm] = useState(false)
-  const [editingPost, setEditingPost] = useState<any>(null)
+  const [editingPost, setEditingPost] = useState<Post | null>(null)
   const [showAddResourceForm, setShowAddResourceForm] = useState(false)
-  const [editingResource, setEditingResource] = useState<any>(null)
+  const [editingResource, setEditingResource] = useState<Resource | null>(null)
   
   // 빈 배열로 초기화 (기본 템플릿 제거)
-  const [executives, setExecutives] = useState([])
-  const [posts, setPosts] = useState([])
-  const [resources, setResources] = useState([])
-  const [faqs, setFaqs] = useState([])
+  const [executives, setExecutives] = useState<Executive[]>([])
+  const [posts, setPosts] = useState<Post[]>([])
+  const [resources, setResources] = useState<Resource[]>([])
+  const [faqs, setFaqs] = useState<FAQ[]>([])
 
   useEffect(() => {
     setAdminPassword(process.env.NEXT_PUBLIC_ADMIN_PASSWORD || 'admin123')
@@ -39,7 +40,7 @@ export default function Admin() {
   }
 
   // 집행부 관리 함수들
-  const handleEditExecutive = (executive: any) => {
+  const handleEditExecutive = (executive: Executive) => {
     setEditingExecutive(executive)
   }
 
@@ -67,7 +68,7 @@ export default function Admin() {
     }
   }
 
-  const handleAddExecutive = async (executiveData: any) => {
+  const handleAddExecutive = async (executiveData: Omit<Executive, 'id'>) => {
     try {
       const response = await fetch('/api/executives', {
         method: 'POST',
@@ -90,7 +91,7 @@ export default function Admin() {
     }
   }
 
-  const handleUpdateExecutive = async (updatedExecutive: any) => {
+  const handleUpdateExecutive = async (updatedExecutive: Executive) => {
     try {
       const response = await fetch('/api/executives', {
         method: 'POST',
@@ -114,7 +115,7 @@ export default function Admin() {
   }
 
   // FAQ 관리 함수들
-  const handleEditFaq = (faq: any) => {
+  const handleEditFaq = (faq: FAQ) => {
     setEditingFaq(faq)
   }
 
@@ -142,7 +143,7 @@ export default function Admin() {
     }
   }
 
-  const handleAddFaq = async (faqData: any) => {
+  const handleAddFaq = async (faqData: Omit<FAQ, 'id'>) => {
     try {
       const response = await fetch('/api/faq', {
         method: 'POST',
@@ -165,7 +166,7 @@ export default function Admin() {
     }
   }
 
-  const handleUpdateFaq = async (updatedFaq: any) => {
+  const handleUpdateFaq = async (updatedFaq: FAQ) => {
     try {
       const response = await fetch('/api/faq', {
         method: 'POST',
@@ -189,7 +190,7 @@ export default function Admin() {
   }
 
   // 게시판 관리 함수들
-  const handleEditPost = (post: any) => {
+  const handleEditPost = (post: Post) => {
     setEditingPost(post)
   }
 
@@ -217,7 +218,7 @@ export default function Admin() {
     }
   }
 
-  const handleAddPost = async (postData: any) => {
+  const handleAddPost = async (postData: Omit<Post, 'id' | 'views' | 'comments'>) => {
     try {
       const response = await fetch('/api/posts', {
         method: 'POST',
@@ -240,7 +241,7 @@ export default function Admin() {
     }
   }
 
-  const handleUpdatePost = async (updatedPost: any) => {
+  const handleUpdatePost = async (updatedPost: Post) => {
     try {
       const response = await fetch('/api/posts', {
         method: 'POST',
@@ -264,7 +265,7 @@ export default function Admin() {
   }
 
   // 자료실 관리 함수들
-  const handleEditResource = (resource: any) => {
+  const handleEditResource = (resource: Resource) => {
     setEditingResource(resource)
   }
 
@@ -292,7 +293,7 @@ export default function Admin() {
     }
   }
 
-  const handleAddResource = async (resourceData: any) => {
+  const handleAddResource = async (resourceData: Omit<Resource, 'id' | 'downloads'>) => {
     try {
       const response = await fetch('/api/resources', {
         method: 'POST',
@@ -315,7 +316,7 @@ export default function Admin() {
     }
   }
 
-  const handleUpdateResource = async (updatedResource: any) => {
+  const handleUpdateResource = async (updatedResource: Resource) => {
     try {
       const response = await fetch('/api/resources', {
         method: 'POST',
@@ -394,6 +395,31 @@ export default function Admin() {
   const handleSectionClick = (section: string) => {
     setActiveSection(section)
     loadData(section)
+  }
+
+  const handleClearAllData = async () => {
+    if (confirm('정말로 모든 데이터를 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.')) {
+      try {
+        const response = await fetch('/api/clear', {
+          method: 'POST'
+        })
+        
+        if (response.ok) {
+          // 모든 상태를 빈 배열로 초기화
+          setExecutives([])
+          setPosts([])
+          setResources([])
+          setFaqs([])
+          setActiveSection('')
+          alert('모든 데이터가 성공적으로 삭제되었습니다.')
+        } else {
+          alert('데이터 삭제 중 오류가 발생했습니다.')
+        }
+      } catch (error) {
+        console.error('Clear all data error:', error)
+        alert('데이터 삭제 중 오류가 발생했습니다.')
+      }
+    }
   }
 
   if (isAuthenticated) {
@@ -580,7 +606,7 @@ export default function Admin() {
                        {executives.length === 0 ? (
                          <p className="text-gray-500 text-center py-8">등록된 집행부가 없습니다.</p>
                        ) : (
-                         executives.map((executive: any) => (
+                         executives.map((executive: Executive) => (
                            <div key={executive.id} className="border p-4 rounded-lg">
                              <div className="flex items-center justify-between">
                                <div>
@@ -682,7 +708,7 @@ export default function Admin() {
                        {faqs.length === 0 ? (
                          <p className="text-gray-500 text-center py-8">등록된 FAQ가 없습니다.</p>
                        ) : (
-                         faqs.map((faq: any) => (
+                         faqs.map((faq: FAQ) => (
                            <div key={faq.id} className="border p-4 rounded-lg">
                              <div className="flex items-center justify-between">
                                <div className="flex-1">
@@ -804,7 +830,7 @@ export default function Admin() {
                        {posts.length === 0 ? (
                          <p className="text-gray-500 text-center py-8">등록된 게시글이 없습니다.</p>
                        ) : (
-                         posts.map((post: any) => (
+                         posts.map((post: Post) => (
                            <div key={post.id} className="border p-4 rounded-lg">
                              <div className="flex items-center justify-between">
                                <div className="flex-1">
@@ -949,7 +975,7 @@ export default function Admin() {
                        {resources.length === 0 ? (
                          <p className="text-gray-500 text-center py-8">등록된 자료가 없습니다.</p>
                        ) : (
-                         resources.map((resource: any) => (
+                         resources.map((resource: Resource) => (
                            <div key={resource.id} className="border p-4 rounded-lg">
                              <div className="flex items-center justify-between">
                                <div className="flex-1">
@@ -988,15 +1014,21 @@ export default function Admin() {
               </div>
             )}
 
-            {/* 로그아웃 버튼 */}
-            <div className="text-center mt-12">
-              <button
-                onClick={() => setIsAuthenticated(false)}
-                className="bg-gray-600 text-white px-6 py-3 rounded-lg hover:bg-gray-700 transition-colors"
-              >
-                로그아웃
-              </button>
-            </div>
+                         {/* 데이터 초기화 및 로그아웃 버튼 */}
+             <div className="text-center mt-12 space-y-4">
+               <button
+                 onClick={handleClearAllData}
+                 className="bg-red-600 text-white px-6 py-3 rounded-lg hover:bg-red-700 transition-colors mx-2"
+               >
+                 모든 데이터 초기화
+               </button>
+               <button
+                 onClick={() => setIsAuthenticated(false)}
+                 className="bg-gray-600 text-white px-6 py-3 rounded-lg hover:bg-gray-700 transition-colors mx-2"
+               >
+                 로그아웃
+               </button>
+             </div>
           </div>
         </section>
       </div>
