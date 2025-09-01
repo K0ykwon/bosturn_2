@@ -1,10 +1,11 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import type { Resource } from '@/lib/redis'
 
 export default function Resources() {
   const [selectedCategory, setSelectedCategory] = useState('all')
-  const [resources, setResources] = useState<any[]>([])
+  const [resources, setResources] = useState<Resource[]>([])
   const [loading, setLoading] = useState(true)
 
   const categories = [
@@ -43,10 +44,10 @@ export default function Resources() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">자료를 불러오는 중...</p>
+          <p className="text-gray-600 dark:text-gray-400">자료를 불러오는 중...</p>
         </div>
       </div>
     )
@@ -69,7 +70,7 @@ export default function Resources() {
         <div className="max-w-6xl mx-auto">
           {/* Category Filter */}
           <div className="mb-12">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">카테고리별 보기</h2>
+                         <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">카테고리별 보기</h2>
             <div className="flex flex-wrap gap-4">
               {categories.map((category) => (
                 <button
@@ -103,7 +104,7 @@ export default function Resources() {
                 </p>
               </div>
             ) : (
-              filteredResources.map((resource: any) => (
+                             filteredResources.map((resource: Resource) => (
                 <div key={resource.id} className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 hover:shadow-xl transition-shadow">
                   <div className="flex items-start justify-between mb-4">
                     <div className="flex-1">

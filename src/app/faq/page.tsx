@@ -1,9 +1,10 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import type { FAQ } from '@/lib/redis'
 
 export default function FAQ() {
-  const [faqs, setFaqs] = useState<any[]>([])
+  const [faqs, setFaqs] = useState<FAQ[]>([])
   const [loading, setLoading] = useState(true)
   const [openFaq, setOpenFaq] = useState<number | null>(null)
 
@@ -35,10 +36,10 @@ export default function FAQ() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">FAQ를 불러오는 중...</p>
+          <p className="text-gray-600 dark:text-gray-400">FAQ를 불러오는 중...</p>
         </div>
       </div>
     )
@@ -67,7 +68,7 @@ export default function FAQ() {
               </div>
             ) : (
               <div className="space-y-4">
-                {faqs.map((faq: any) => (
+                                 {faqs.map((faq: FAQ) => (
                   <div key={faq.id} className="bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden">
                     <button
                       onClick={() => toggleFaq(faq.id)}

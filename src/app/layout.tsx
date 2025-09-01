@@ -2,7 +2,8 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from '@/contexts/ThemeContext';
-import ThemeToggle from '@/components/ThemeToggle';
+import Link from 'next/link';
+
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -34,9 +35,9 @@ export default function RootLayout({
           <div className="max-w-6xl mx-auto px-4">
             <div className="flex justify-between items-center h-16">
               <div className="flex items-center">
-                <a href="/" className="text-2xl font-bold text-blue-600 dark:text-blue-400">
+                <Link href="/" className="text-2xl font-bold text-blue-600 dark:text-blue-400">
                   Bosturn
-                </a>
+                </Link>
               </div>
               <div className="hidden md:flex space-x-8 items-center">
                 <a href="/about" className="text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">동아리 소개</a>
