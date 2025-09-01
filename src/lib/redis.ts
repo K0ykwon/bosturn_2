@@ -6,7 +6,10 @@ declare global {
 
 // 전역 Redis 클라이언트 인스턴스
 const client = globalThis.__redis ?? createClient({
-  url: process.env.REDIS_URL || 'redis://localhost:6379'
+  url: process.env.REDIS_URL || 'redis://localhost:6379',
+  socket: {
+    rejectUnauthorized: false
+  }
 });
 
 if (process.env.NODE_ENV !== 'production') globalThis.__redis = client;
@@ -19,7 +22,8 @@ async function ensureRedisConnection() {
       console.log('Redis connected successfully');
     } catch (error) {
       console.error('Redis connection failed:', error);
-      throw error;
+      // 연결 실패 시에도 에러를 던지지 않고 계속 진행
+      console.warn('Redis connection failed, continuing without Redis...');
     }
   }
 }

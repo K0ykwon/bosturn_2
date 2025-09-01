@@ -5,6 +5,14 @@ export async function POST(request: NextRequest) {
   try {
     const redis = await getRedisClient()
     
+    // Redis가 연결되지 않은 경우 처리
+    if (!redis.isOpen) {
+      return NextResponse.json({ 
+        success: false, 
+        error: 'Redis 연결이 되지 않았습니다.' 
+      }, { status: 503 })
+    }
+    
     // 모든 Bosturn 관련 데이터 삭제
     await redis.del('executives')
     await redis.del('posts')
