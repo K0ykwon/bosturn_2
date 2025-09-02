@@ -7,7 +7,7 @@ declare global {
 // 전역 Redis 클라이언트 인스턴스
 const client = globalThis.__redis ?? createClient({
   url: process.env.REDIS_URL || 'redis://localhost:6379',
-  socket: process.env.REDIS_URL?.startsWith('rediss://') ? {
+  socket: (process.env.REDIS_URL && process.env.REDIS_URL.startsWith('rediss://')) ? {
     tls: true,
     rejectUnauthorized: false
   } : undefined
