@@ -8,6 +8,7 @@ declare global {
 const client = globalThis.__redis ?? createClient({
   url: process.env.REDIS_URL || 'redis://localhost:6379',
   socket: {
+    tls: true,
     rejectUnauthorized: false
   }
 });
